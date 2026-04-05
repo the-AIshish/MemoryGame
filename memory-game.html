@@ -15,6 +15,15 @@
             --success-color: #4caf50;
         }
 
+        [data-theme="dark"] {
+            --primary-color: #64b5f6;
+            --background-color: #121212;
+            --card-back: #1976d2;
+            --card-front: #1e1e1e;
+            --text-color: #ffffff;
+            --success-color: #81c784;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -54,7 +63,7 @@
             justify-content: space-around;
             flex-wrap: wrap;
             gap: 1rem;
-            background: white;
+            background: var(--card-front);
             padding: 1rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -93,6 +102,17 @@
 
         button.active {
             background-color: #0d47a1;
+        }
+
+        .theme-btn {
+            background: var(--card-front);
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .theme-btn:hover {
+            background: var(--primary-color);
+            color: white;
         }
 
         /* Game grid styles with responsive layout */
@@ -173,7 +193,8 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--card-front);
+            color: var(--text-color);
             padding: 2rem;
             border-radius: 8px;
             text-align: center;
@@ -190,7 +211,8 @@
         .scores-list {
             max-width: 600px;
             margin: 1rem auto;
-            background: white;
+            background: var(--card-front);
+            color: var(--text-color);
             padding: 1rem;
             border-radius: 8px;
         }
@@ -234,6 +256,9 @@
                 <h2>Rating</h2>
                 <p class="stat-value rating" aria-live="polite">★★★</p>
             </div>
+            <div class="stat">
+                <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
+            </div>
         </div>
 
         <!-- Grid size selector -->
@@ -274,7 +299,8 @@
             canFlip: true,
             gridSize: 4,
             totalPairs: 8,
-            gameStarted: false
+            gameStarted: false,
+            theme: localStorage.getItem('memoryGameTheme') || 'light'
         };
 
         // DOM Elements
@@ -286,7 +312,8 @@
             modal: document.querySelector('.modal'),
             finalStats: document.querySelector('.final-stats'),
             gridButtons: document.querySelectorAll('.grid-btn'),
-            scoresList: document.querySelector('.scores-list')
+            scoresList: document.querySelector('.scores-list'),
+            themeToggle: document.getElementById('theme-toggle')
         };
 
         // Card symbols (emojis) for both grid sizes
@@ -427,6 +454,14 @@
                 '<p>No scores yet. Start playing to set some records!</p>';
         }
 
+        // Toggle theme function
+        function toggleTheme() {
+            gameState.theme = gameState.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', gameState.theme);
+            localStorage.setItem('memoryGameTheme', gameState.theme);
+            elements.themeToggle.textContent = gameState.theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+        }
+
         // Handle card flip logic
         function flipCard(card) {
             if (!gameState.canFlip || card.classList.contains('matched') || 
@@ -497,6 +532,13 @@
                 }
             });
         });
+
+        // Initialize theme
+        document.documentElement.setAttribute('data-theme', gameState.theme);
+        elements.themeToggle.textContent = gameState.theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+
+        // Theme toggle event listener
+        elements.themeToggle.addEventListener('click', toggleTheme);
 
         // Initialize game
         updateScoresList();
